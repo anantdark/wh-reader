@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WhatsApp Chat Reader</title>
+<meta name="description" content="Read exported WhatsApp .txt chats in the WhatsApp interface. Everything stays on your device." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="wa">
+
+  <!-- ══════════ left pane: chat list ══════════ -->
+  <div class="pane-left" id="paneLeft">
+    <header class="left-head">
+      <div class="avatar av-me" title="Chat archive">
+        <svg viewBox="0 0 212 212" width="40" height="40" aria-hidden="true"><path fill="#fff" d="M106.251.5C164.653.5 212 47.846 212 106.25S164.653 212 106.25 212C47.846 212 .5 164.654.5 106.25S47.846.5 106.251.5" opacity=".13"/><path fill="currentColor" d="M106.25 0C47.767 0 0 47.767 0 106.25S47.767 212.5 106.25 212.5 212.5 164.733 212.5 106.25 164.733 0 106.25 0m0 39.792c19.653 0 35.583 15.93 35.583 35.583s-15.93 35.583-35.583 35.583-35.583-15.93-35.583-35.583 15.93-35.583 35.583-35.583m0 138.916c-23.717 0-44.9-10.844-58.87-27.83 6.884-13.352 27.048-23.503 58.87-23.503s51.986 10.151 58.87 23.503c-13.97 16.986-35.153 27.83-58.87 27.83"/></svg>
+      </div>
+      <nav class="left-head-actions">
+        <button class="icon-btn" id="addChatBtn" title="Add chat export" aria-label="Add chat export">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19.005 3.175H4.674C3.642 3.175 3 3.789 3 4.821V21.02l3.544-3.514h12.461c1.033 0 2.064-1.06 2.064-2.093V4.821c-.001-1.032-1.032-1.646-2.064-1.646m-4.989 9.869H7.041V11.1h6.975zm3-3.906H7.041V7.194h9.975z"/></svg>
+        </button>
+        <button class="icon-btn" id="themeBtn" title="Switch theme" aria-label="Switch theme">
+          <svg id="themeIcon" viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.4-9.6c-.36-.2-.73-.3-1.1-.3"/></svg>
+        </button>
+        <button class="icon-btn" id="menuBtn" title="Menu" aria-label="Menu" aria-haspopup="true">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></svg>
+        </button>
+        <div class="menu" id="menu" hidden role="menu">
+          <button role="menuitem" data-act="add">Add chat export</button>
+          <button role="menuitem" data-act="closeAll">Close all chats</button>
+        </div>
+      </nav>
+    </header>
+
+    <div class="left-search">
+      <div class="search-field">
+        <span class="sf-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M15.009 13.805h-.636l-.22-.219a5.18 5.18 0 0 0 1.256-3.386 5.207 5.207 0 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195zm-4.808 0a3.605 3.605 0 1 1 0-7.21 3.605 3.605 0 0 1 0 7.21"/></svg>
+        </span>
+        <input type="text" id="globalSearch" placeholder="Search or start new chat" aria-label="Search chats and messages" autocomplete="off" />
+        <button class="sf-clear" id="clearGlobal" hidden aria-label="Clear search">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="chips" id="chips" role="tablist">
+      <button class="chip on" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button class="chip" data-filter="favourites" role="tab" aria-selected="false">Favourites</button>
+      <button class="chip" data-filter="groups" role="tab" aria-selected="false">Groups</button>
+    </div>
+
+    <div class="list-scroll" id="listScroll">
+      <div id="chatList" class="chat-list"></div>
+      <div id="msgResults" class="msg-results" hidden></div>
+      <div id="listEmpty" class="list-empty">
+        <p>No chats yet.</p>
+        <button class="text-btn" id="listEmptyAdd">Add a chat export</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ right pane ══════════ -->
+  <div class="pane-right">
+
+    <!-- intro / drop screen -->
+    <section class="intro" id="intro">
+      <div class="intro-inner">
+        <div class="intro-art" aria-hidden="true">
+          <svg viewBox="0 0 303 172" width="260"><path fill="currentColor" opacity=".12" d="M131 0h41c72 0 131 59 131 131v41H0v-41C0 59 59 0 131 0"/><path fill="currentColor" opacity=".25" d="M64 52h120a10 10 0 0 1 10 10v52a10 10 0 0 1-10 10h-63l-24 20v-20H64a10 10 0 0 1-10-10V62a10 10 0 0 1 10-10"/><path fill="currentColor" opacity=".45" d="M78 72h74v7H78zm0 18h56v7H78z"/></svg>
+        </div>
+        <h1>WhatsApp Chat Reader</h1>
+        <p class="intro-sub">Drop your exported <code>.txt</code> chats anywhere on this window to read them here. You can add several at once.</p>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose chat export files">
+          <svg class="dz-icon" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96M14 13v4h-4v-4H7l5-5 5 5z"/></svg>
+          <p class="dz-title">Drag &amp; drop chat exports</p>
+          <p class="dz-or">or <span class="link">browse for files</span></p>
+        </div>
+
+        <details class="how">
+          <summary>How to export a chat</summary>
+          <ol>
+            <li>Open the chat in WhatsApp.</li>
+            <li>Tap the chat name, then <b>Export chat</b>.</li>
+            <li>Pick <b>Without media</b> and save the <code>.txt</code>.</li>
+            <li>Drop the file here.</li>
+          </ol>
+        </details>
+
+        <p class="intro-lock">
+          <svg viewBox="0 0 10 12" width="10" height="12" aria-hidden="true"><path fill="currentColor" d="M5 0a3 3 0 0 0-3 3v2H1.5A1.5 1.5 0 0 0 0 6.5v4A1.5 1.5 0 0 0 1.5 12h7A1.5 1.5 0 0 0 10 10.5v-4A1.5 1.5 0 0 0 8.5 5H8V3a3 3 0 0 0-3-3m0 1.5A1.5 1.5 0 0 1 6.5 3v2h-3V3A1.5 1.5 0 0 1 5 1.5"/></svg>
+          Your files never leave this device.
+        </p>
+      </div>
+    </section>
+
+    <!-- conversation -->
+    <section class="conv" id="conv" hidden>
+      <header class="conv-head">
+        <button class="icon-btn only-narrow" id="backBtn" aria-label="Back to chats">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg>
+        </button>
+        <button class="conv-id" id="convId">
+          <span class="avatar" id="convAvatar">#</span>
+          <span class="conv-meta">
+            <span class="conv-name" id="convName">Chat</span>
+            <span class="conv-sub" id="convSub"></span>
+          </span>
+        </button>
+        <div class="conv-actions">
+          <button class="icon-btn" id="convSearchBtn" title="Search" aria-label="Search this chat">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.009 13.805h-.636l-.22-.219a5.18 5.18 0 0 0 1.256-3.386 5.207 5.207 0 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195zm-4.808 0a3.605 3.605 0 1 1 0-7.21 3.605 3.605 0 0 1 0 7.21"/></svg>
+          </button>
+          <button class="icon-btn" id="convMenuBtn" title="Menu" aria-label="Chat menu" aria-haspopup="true">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/></svg>
+          </button>
+          <div class="menu right" id="convMenu" hidden role="menu">
+            <button role="menuitem" data-act="info">Chat info</button>
+            <button role="menuitem" data-act="search">Search messages</button>
+            <button role="menuitem" data-act="star">Add to favourites</button>
+            <button role="menuitem" data-act="close">Close chat</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="thread-wrap" id="threadWrap">
+        <div class="float-date" id="floatDate" hidden></div>
+        <div class="scroller" id="scroller">
+          <div class="thread" id="thread"></div>
+          <div class="render-note" id="renderNote" hidden>Loading messages&hellip;</div>
+        </div>
+        <button class="round-btn" id="toBottom" title="Scroll to bottom" aria-label="Scroll to bottom" hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+        </button>
+      </div>
+
+      <footer class="composer">
+        <div class="composer-box">
+          <span class="composer-text">Read-only chat export</span>
+        </div>
+      </footer>
+    </section>
+  </div>
+
+  <!-- ══════════ right drawer ══════════ -->
+  <aside class="drawer" id="drawer" hidden aria-label="Chat panel">
+    <header class="drawer-head">
+      <button class="icon-btn" id="drawerClose" aria-label="Close panel">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+      <span id="drawerTitle">Search messages</span>
+    </header>
+
+    <div class="drawer-body">
+      <!-- search view -->
+      <div id="drawerSearch">
+        <div class="drawer-search-field">
+          <div class="search-field">
+            <span class="sf-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M15.009 13.805h-.636l-.22-.219a5.18 5.18 0 0 0 1.256-3.386 5.207 5.207 0 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195zm-4.808 0a3.605 3.605 0 1 1 0-7.21 3.605 3.605 0 0 1 0 7.21"/></svg>
+            </span>
+            <input type="text" id="convSearch" placeholder="Search messages" aria-label="Search in this chat" autocomplete="off" />
+          </div>
+        </div>
+        <div class="drawer-hint" id="convSearchHint">Search for messages in this chat</div>
+        <div class="drawer-results" id="convResults"></div>
+      </div>
+
+      <!-- info view -->
+      <div id="drawerInfo" hidden>
+        <div class="info-top">
+          <span class="avatar big" id="infoAvatar">#</span>
+          <h2 id="infoName">Chat</h2>
+          <p id="infoSub"></p>
+        </div>
+        <div class="info-block">
+          <h4>You in this chat</h4>
+          <p class="info-note">Exports don't record who saved them. Pick yourself so the bubbles line up.</p>
+          <div id="meList" class="me-list"></div>
+        </div>
+        <div class="info-block">
+          <h4>Show messages from</h4>
+          <div id="filterList" class="filter-list"></div>
+        </div>
+        <div class="info-block">
+          <h4>Overview</h4>
+          <dl id="stats" class="stats"></dl>
+        </div>
+        <div class="info-block danger">
+          <button class="row-btn danger" id="closeChatBtn">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>
+            Close this chat
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<input type="file" id="fileInput" accept=".txt,text/plain" multiple hidden />
+
+<div class="drag-overlay" id="dragOverlay" hidden>
+  <div class="drag-inner">
+    <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path fill="currentColor" d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96M14 13v4h-4v-4H7l5-5 5 5z"/></svg>
+    <p>Drop chat exports to open them</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="parser.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
